@@ -1,83 +1,61 @@
+// FormInputWrapper.tsx
 import React from "react";
 import {
-  Controller,
-  Control,
-  ControllerRenderProps,
-  FieldValues,
-  ControllerFieldState,
-  FieldErrors,
-} from "react-hook-form";
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "../ui/form"; // Adjust the import path as needed
 import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@radix-ui/react-tooltip"; // Assuming Radix UI is used
-import { AlertCircle } from "lucide-react"; // Icon for displaying errors
+  Control,
+  FieldValues,
+  ControllerRenderProps,
+  ControllerFieldState,
+  Path,
+} from "react-hook-form";
 
-interface FormInputWrapperProps {
+interface FormInputWrapperProps<
+  TFieldValues extends FieldValues = FieldValues
+> {
   name: string;
-  control: Control;
+  control: Control<TFieldValues>;
   labelText?: string;
-  placeholder?: string;
-  disabled?: boolean;
-  readOnly?: boolean;
-  errors?: FieldErrors;
-  renderInput: (
-    field: ControllerRenderProps<FieldValues, string>,
+  children: (
+    field: ControllerRenderProps<TFieldValues, Path<TFieldValues>>,
     fieldState: ControllerFieldState
   ) => React.ReactNode;
 }
 
-const FormInputWrapper: React.FC<FormInputWrapperProps> = ({
+const FormInputWrapper = <TFieldValues extends FieldValues = FieldValues>({
   name,
   control,
   labelText,
-  errors,
-  renderInput,
-}) => {
-  const hasError = !!(errors && errors[name]);
-  return (
-    <div
-      key={name}
-      className={`form-item relative mt-3 ${
-        name === "newsletter"
-          ? "flex flex-row-reverse justify-end items-center"
-          : ""
-      }`}
-    >
-      {/* Label and Error Icon */}
-      <div className="flex items-center space-x-2 mb-1">
-        {hasError && (
-          <Tooltip>
-            <TooltipTrigger>
-              {/* Error Icon that triggers the tooltip */}
-              <AlertCircle className="text-red-500" size="18" />
-            </TooltipTrigger>
-            <TooltipContent
-              side="right"
-              align="center"
-              className="bg-red-500 text-white p-2 rounded"
-            >
-              {errors[name]?.message?.toString()}
-            </TooltipContent>
-          </Tooltip>
-        )}
-        {labelText && (
-          <label className="text-sm font-bold" htmlFor={name}>
-            {labelText}
-          </label>
-        )}
-      </div>
+  children,
+}: FormInputWrapperProps<TFieldValues>): React.ReactElement => {
+  const labelBesideInput = children.toString().includes("Checkbox");
 
-      {/* Render the Input Component */}
-      <Controller
-        name={name}
-        control={control}
-        render={({ field, fieldState }) => (
-          <>{renderInput(field, fieldState)}</>
-        )}
-      />
-    </div>
+  return (
+    <FormField
+      control={control}
+      name={name as Path<TFieldValues>}
+      render={({ field, fieldState }) => (
+        <FormItem>
+          <div
+            className={`flex  gap-2 ${
+              labelBesideInput ? "flex-row-reverse justify-end" : "flex-col"
+            }`}
+          >
+            {labelText && (
+              <FormLabel className="font-bold">{labelText}</FormLabel>
+            )}
+            <FormControl>{children(field, fieldState)}</FormControl>
+          </div>
+
+          <FormMessage>{fieldState.error?.message}</FormMessage>
+        </FormItem>
+      )}
+    />
   );
 };
 

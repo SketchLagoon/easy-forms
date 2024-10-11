@@ -1,8 +1,9 @@
+// FormBuilder.stories.tsx
 import React from "react";
-import { ComponentMeta, ComponentStory } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react";
 import FormBuilder, {
   FormBuilderProps,
-} from "../../components/FormBuilder/FormBuilder"; // Adjust the import path as needed
+} from "../../components/FormBuilder/FormBuilder";
 import {
   firstName,
   lastName,
@@ -11,11 +12,11 @@ import {
   newsletter,
   gender,
 } from "@/components/FormBuilder/inputs";
-// Define meta for Storybook
+
 export default {
   title: "Form/FormBuilder",
   component: FormBuilder,
-} as ComponentMeta<typeof FormBuilder>;
+} as Meta<typeof FormBuilder>;
 
 const formSchema = {
   PersonalInfo: {
@@ -32,21 +33,18 @@ const formSchema = {
   },
 };
 
-// Mock submit handler for Storybook
 const handleFormSubmit = async (data: unknown) => {
   console.log("Form Submitted with Data:", data);
-  // Simulate a loading delay
   return new Promise((resolve) => setTimeout(resolve, 2000));
 };
 
-// Default Storybook Template
-const Template: ComponentStory<typeof FormBuilder> = (
-  args: FormBuilderProps
-) => <FormBuilder {...args} />;
+const Template: StoryFn<typeof FormBuilder> = (args: FormBuilderProps) => (
+  <FormBuilder {...args} />
+);
 
-// Story definition
 export const ExampleForm = Template.bind({});
 ExampleForm.args = {
+  title: "Example Form",
   formSchema,
   submitHandler: handleFormSubmit,
   saveLabel: "Submit",
